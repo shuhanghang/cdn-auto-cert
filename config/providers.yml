@@ -1,0 +1,47 @@
+# dnsProvider 支持： aliyun (阿里云)、dnsPod (腾讯云)、huawei(华为云)、cloudFlare
+# cdnProvider 支持： aliyun (阿里云)、tencent (腾讯云)
+Providers:
+- cdnProvider: aliyun
+  description: "CDN提供商是阿里云，使用的加速域名提供商是阿里云、腾讯云"
+  providerKey:
+    accessKey: ""
+    accessSecret: ""
+    
+  dns:
+    - provider: aliyun
+      providerKey:
+        accessKey: ""
+        accessSecret: ""
+      domains:
+        - test1.com
+        - test2.cn
+
+    - provider: dnsPod
+      providerKey:
+        DP_Id: "" 
+        DP_Key: ""
+      domains:
+        - "test1.net"
+
+
+- cdnProvider: tencent
+  description: "CDN提供商是腾讯云，使用的加速域名提供商是cloudFlare、华为"
+  providerKey:
+    SecretId: ""
+    SecretKey: ""
+  dns:
+    - provider: cloudFlare
+      providerKey:
+        CF_Key: ""
+        CF_Email: "test@test.com"
+      domains:
+        - test1.xyz
+        - test2.org
+
+    - provider: huawei
+      providerKey:
+        HUAWEICLOUD_Username: ""
+        HUAWEICLOUD_Password: ""
+        HUAWEICLOUD_ProjectID: ""
+      domains:
+        - test1.io
