@@ -13,9 +13,5 @@ WORKDIR /home
 COPY --from=builder /home /home
 RUN sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list && \
     apt update && \
-    apt install -y socat curl && \
-    tar -xf acme.sh.tar.gz && \
-    rm -rf acme.sh.tar.gz && \
-    cd acme.sh && \
-    ./acme.sh --install --no-cron --force
+    apt install -y socat curl
 CMD [ "python3", "cdn_auto_cert_scheduler.py" ]
