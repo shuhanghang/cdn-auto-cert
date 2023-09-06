@@ -1,0 +1,10 @@
+*.md
+.git
+docs
+venv
+config/dev*
+__pycache__
+instance
+.pytest_cache
+test.py
+.vscode

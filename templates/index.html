@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CDN域名证书监控</title>
+  <!-- <link href="static/bootstrap-5.3.1/css/bootstrap.min.css" rel="stylesheet"> -->
+  <link href="static/layui-v2.8.16/css/layui.css" rel="stylesheet">
+  <script type="text/javascript" src="static/layui-v2.8.16/layui.js"></script>
+</head>
+
+<body>
+
+  <div class="layui-container">
+    <ul class="layui-nav layui-bg-gray" style="text-align: right;">
+
+      <!-- <li class="layui-nav-item">
+        <div class="layui-form-item">
+          <input type="checkbox" name="CCC" value="2" lay-skin="switch">
+          <div lay-checkbox>
+            <i class="layui-icon layui-icon-moon"></i> | 
+            <i class="layui-icon layui-icon-light"></i>
+          </div>
+      </li> -->
+
+      <li class="layui-nav-item" lay-unselect>
+        <a href="javascript:;">
+          <img src="static/images/admin.jpg" class="layui-nav-img">
+        </a>
+        <dl class="layui-nav-child">
+          <dd style="text-align: center;"><a href="https://github.com/shuhanghang/cdn-auto-cert" target="_blank"><i
+                class="layui-icon layui-icon-github" style="font-size: 25px;"></i></a></dd>
+        </dl>
+      </li>
+    </ul>
+
+    <div class="layui-row" style="margin: 2% auto">
+
+      <div class="layui-col-md2">
+        <div class="layui-form">
+          <select id='cdnType' lay-filter="demo-select-filter">
+            <option value="">CDN分类</option>
+            <option value="aliyun">阿里云</option>
+            <option value="huawei">华为云</option>
+            <option value="tencent">腾讯云</option>
+          </select>
+        </div>
+      </div>
+
+
+      <div class="layui-col-md2 layui-col-md-offset8">
+        <div class="layui-input-wrap layui-form">
+          <input id="searchDomain" type="text" lay-affix="search" lay-filter="search" lay-affix="clear"
+            placeholder="搜索域名" class="layui-input">
+          <!-- <div class="layui-input-split layui-input-suffix" style="cursor: pointer;">
+            <i class="layui-icon layui-icon-search"></i>
+          </div> -->
+        </div>
+      </div>
+    </div>
+
+    <!-- <div class="layui-form" lay-filter="demo-checkbox-filter"> -->
+    <!-- <div class="layui-form-item" style="display: flex;">
+        <label class="layui-form-label"><strong>CDN分类： </strong></label>
+        <input type="checkbox" name="AAA" title="所有" checked>
+        <input type="checkbox" name="ddd" title="aliyun">
+        <input type="checkbox" name="BBB" title="huawei">
+        <input type="checkbox" name="CCC" title="tencent"> -->
+
+    <!-- <div class="layui-form-item"> 
+        <label>CDN分类：</label>
+        <input type="checkbox" name="AAA" title="aliyun">
+        <input type="checkbox" name="BBB" title="huawei">
+        <input type="checkbox" name="CCC" title="tencent">
+      </div> -->
+    <!-- </div> -->
+
+    <div class="layui-row" style="margin: 1% auto">
+      <div class="layui-col-md2 layui-col-md-offset10">
+        <i class="layui-icon layui-icon-refresh" style="font-size: 13px;"><a lay-on="updateAllStatus"> 更新状态</a></i>
+      </div>
+    </div>
+
+    <div class="layui-panel">
+      <table class="layui-hide" id="sslOnline-table" lay-filter="sslOnline-table"></table>
+    </div>
+  </div>
+
+  <script>
+    layui.use(['jquery'], function () {
+      var table = layui.table;
+      var layer = layui.layer;
+      var $ = layui.jquery;
+      var form = layui.form;
+      var util = layui.util;
+      document.getElementById("cdnType").value = "";
+      document.getElementById("searchDomain").value = "";
+      // 创建表格实例
+      table.render({
+        elem: '#sslOnline-table',
+        url: '/api/v1/ssl/list',
+        cols: [[
+          { field: 'id', title: 'ID', width: 100, sort: true, fixed: true, align: "center" },
+          {
+            field: 'domain', title: '域名', sort: true, align: "center", templet: function (res) {
+              return '<a href=https://' + res.domain + ' target="_blank">' + res.domain + '</a>';
+            }
+          },
+          { field: 'issuer', title: 'CA', width: 160, align: "center" },
+          { field: 'cdn_type', title: 'CDN', width: 150, sort: true, align: "center" },
+          {
+            field: 'expire', title: '过期', width: 160, align: "center", templet: function (res) {
+              if (res.progress > 5 && res.progress < 20) {
+                return '<div class="progress" role="progressbar" style="height: 8px" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"><div class="progress-bar progress-bar-striped bg-warning" style="width: ' + res.progress + '%"></div></div><p>' + res.expire + '</p>'
+              }
+              if (res.progress <= 5) {
+                return '<div class="progress" role="progressbar" style="height: 8px" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"><div class="progress-bar progress-bar-striped bg-danger" style="width: ' + res.progress + '%"></div></div><p>' + res.expire + '</p>'
+              }
+              return '<div class="progress" role="progressbar" style="height: 8px" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"><div class="progress-bar progress-bar-striped" style="width: ' + res.progress + '%"></div></div><p>' + res.expire + '</p>'
+            }
+          },
+          {
+            field: 'cert_exp', title: '状态', width: 100, sort: true, align: "center", templet: function (res) {
+              if (res.cert_exp) {
+                return '<span >❌</span>';
+              } else {
+                return '<span >✔️</span>';
+              }
+            }
+          },
+          { field: 'create_time', title: '更新时间', sort: true, align: "center" },
+          {
+            title: '操作', sort: true, align: "center", templet: function (res) {
+              var ssl_div = '<div class="layui-clear-space"><button type="button" id="updateStatus' + res.id + '" class="layui-btn layui-btn-xs"><i class="layui-icon " id="updateStatusIcon' + res.id + '" lay-event="sslUpdate">更新状态</i></button>'
+              var cert_div = '<button type="button" id="updateCert' + res.id + '" class="layui-btn layui-btn-xs"><i class="layui-icon" id="updateCertIcon' + res.id + '" lay-event="certUpdate">更新证书</i></button></div>'
+              if (res.ssl_status) {
+                ssl_div = '<div class="layui-clear-space"><button type="button" id="updateStatus' + res.id + '" class="layui-btn layui-btn-disabled layui-btn-xs"><i class="layui-icon layui-anim-scaleSpring layui-anim layui-anim-loop" id="updateStatusIcon' + res.id + '" lay-event="sslUpdate">更新状态</i></button>'
+              }
+              if (res.cert_status) {
+                cert_div = '<button type="button" id="updateCert' + res.id + '" class="layui-btn  layui-btn-disabled layui-btn-xs"><i class="layui-icon  layui-anim-scaleSpring layui-anim layui-anim-loop" id="updateCertIcon' + res.id + '" lay-event="certUpdate">更新证书</i></button></div>'
+              }
+              return ssl_div + cert_div
+            }
+          },
+        ]],
+        page: true,
+        limit: 10,
+        parseData: function (res) { // res 即为原始返回的数据
+          return {
+            "code": res.code, // 解析接口状态
+            "msg": '',      // 解析提示文本
+            "count": res.count, // 解析数据长度
+            "data": res.data // 解析数据列表
+          };
+        },
+      });
+
+      util.on('lay-on', {
+        'updateAllStatus': function () {
+          updateAllSsl()
+        }
+      });
+
+      form.on('input-affix(search)', function (data) {
+        var value = data.elem.value
+        // 执行搜索重载
+        table.reload('sslOnline-table', {
+          page: {
+            curr: 1 // 重新从第 1 页开始
+          },
+          where: {
+            'domain': value
+          } // 搜索的字段
+        });
+        return true
+      });
+
+      form.on('select(demo-select-filter)', function (data) {
+        var value = data.value; // 获得被选中的值
+        // 执行搜索重载
+        table.reload('sslOnline-table', {
+          page: {
+            curr: 1 // 重新从第 1 页开始
+          },
+          where: {
+            'cdn_type': value
+          } // 搜索的字段
+        });
+        return true
+      });
+
+      // 操作栏事件
+      table.on('tool(sslOnline-table)', function (obj) {
+        var data = obj.data; // 获得当前行数据
+        var layEvent = obj.event;
+        if (layEvent === 'sslUpdate') {
+          $('#updateStatus' + data.id).addClass('layui-btn-disabled')
+          $('#updateStatusIcon' + data.id).addClass('layui-anim-scaleSpring layui-anim layui-anim-loop')
+          updateSsl(obj)
+        }
+        if (layEvent === 'certUpdate') {
+          $('#updateCert' + data.id).addClass('layui-btn-disabled')
+          $('#updateCertIcon' + data.id).addClass('layui-anim-scaleSpring layui-anim layui-anim-loop')
+          updateCert(obj)
+        }
+      });
+
+      // 更新所有ssl数据
+      function updateAllSsl() {
+        var loadIndex = layer.load(0)
+        return $.ajax({
+          url: "/api/v1/ssl/update",
+          type: "POST",
+          contentType: 'application/json;charset=UTF-8',
+          success: function (res) {
+            var data = res.data
+            if (res.code === 2000) {
+              layer.msg(`更新状态成功`, { offset: 't', anim: 'slideDown', icon: 1 })
+              table.reload('sslOnline-table')
+            } else {
+              layer.msg(`更新状态失败`, { offset: 't', anim: 'slideDown', icon: 3 })
+            }
+          },
+          error: function (xhr, status, error) {
+            layer.msg('更新状态失败, 服务器错误', { offset: 't', anim: 'slideDown', icon: 2 })
+          },
+          complete: function () {
+            layer.close(loadIndex)
+          }
+        })
+      };
+
+      // 更新ssl数据
+      function updateSsl(obj) {
+        var data = obj.data;
+        var reqData = {
+          "cdn_type": data.cdn_type,
+          "domain": data.domain
+        }
+        return $.ajax({
+          url: "/api/v1/ssl/check",
+          type: "POST",
+          data: JSON.stringify(reqData),
+          contentType: 'application/json;charset=UTF-8',
+          success: function (res) {
+            var data = res.data
+            if (res.code === 2000) {
+              obj.update({
+                'issuer': data.issuer,
+                'expire': data.expire,
+                'cert_exp': data.cert_exp,
+                "progress": data.progress,
+                "create_time": data.create_time
+              })
+              layer.msg(`${data.domain} 更新状态成功`, { offset: 't', anim: 'slideDown', icon: 1 })
+            } else {
+              layer.msg(`${data.domain} 更新状态失败`, { offset: 't', anim: 'slideDown', icon: 3 })
+            }
+          },
+          error: function (xhr, status, error) {
+            layer.msg('更新状态失败, 服务器错误', { offset: 't', anim: 'slideDown', icon: 2 })
+          },
+          complete: function () {
+            $('#updateStatus' + data.id).removeClass('layui-btn-disabled')
+            $('#updateStatusIcon' + data.id).removeClass('layui-anim-scaleSpring layui-anim layui-anim-loop')
+          }
+        })
+      };
+
+      // 更新证书
+      function updateCert(obj) {
+        var data = obj.data;
+        return $.ajax({
+          url: "/api/v1/cert/update",
+          type: "POST",
+          data: JSON.stringify(data),
+          contentType: 'application/json;charset=UTF-8',
+          success: function (res) {
+            if (res.code === 5000) {
+              layer.msg(`${data.domain} ${res.msg}`, { offset: 't', anim: 'slideDown', icon: 3 })
+            } else {
+              layer.msg(`${data.domain} 更新证书成功`, { offset: 't', anim: 'slideDown', icon: 1 });
+            }
+          },
+          error: function (xhr, status, error) {
+            layer.msg('更新证书失败, 服务器错误', { offset: 't', anim: 'slideDown', icon: 2 })
+          },
+          complete: function () {
+            $('#updateCert' + data.id).removeClass('layui-btn-disabled')
+            $('#updateCertIcon' + data.id).removeClass('layui-anim-scaleSpring layui-anim layui-anim-loop')
+          }
+        })
+      };
+
+    });
+  </script>
+</body>
+
+</html>
