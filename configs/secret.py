@@ -1,6 +1,7 @@
-# 使用zerossl请求证书时指定，参考 https://ffis.me/archives/2110.html/comment-page-3
-# 当申请证书上传到cdn报证书链错误时，推荐使用zerossl
-
+# zerossl密钥
+## 默认值为空
+## 使用zerossl申请证书时指定，参考 https://ffis.me/archives/2110.html/comment-page-3
+## 当使用其他机构申请的证书上传到cdn报证书链错误时，推荐使用zerossl申请证书
 ZeroSSL_KID = ""
 ZeroSSL_HMAC = ""
 
