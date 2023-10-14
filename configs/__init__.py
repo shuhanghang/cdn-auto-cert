@@ -13,3 +13,4 @@ else:
         os.path.abspath("."), "configs/providers.yml")
 
 cert_handler_list= []
+runtime_type = {}
