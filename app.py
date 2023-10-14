@@ -1,11 +1,11 @@
 from flask import Flask, render_template
 from sqlalchemy import or_
+
 from model.db import db, SSlOnline
 from views.utils.tasks import scheduler
 from views.utils.auth import auth
-
 from views import ssl_bp, cert_bp
-
+from configs import runtime_type
 
 class Config:
     SCHEDULER_API_ENABLED = True
@@ -17,6 +17,7 @@ class Config:
 
 def create_app():
     app = Flask(__name__)
+    runtime_type['flask'] = True
     app.config.from_object(Config())
     db.init_app(app)
     scheduler.init_app(app)
