@@ -36,7 +36,7 @@ python3 auto_cert_scheduler.py
 ---
 支持面板，默认账号密码：admin/admin
 ```shell
-pip3 install -r requirements.txt -i https://pypi.doubanio.com/simple
+pip3 install -r requirements_ui.txt -i https://pypi.doubanio.com/simple
 python3 app.py
 ```
 ### 3. docker
