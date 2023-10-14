@@ -16,9 +16,6 @@ from configs import runtime_type
 from utils.checker.type import CheckedCnameModel
 
 
-if runtime_type.get('flask'):
-    from model.db import db, SSlOnline
-
 class ShowResultNull(Exception):
     """
     """
@@ -373,6 +370,7 @@ def check(checked_domain: CheckedCnameModel):
         args = {'hosts': [domain]}
         check_res = json.loads(SSLChecker.show_result(SSLChecker.get_args(json_args=args)))
         if check_res and runtime_type.get('flask'):
+            from model.db import db, SSlOnline
             ssl = SSlOnline()
             if query_ssl := db.session.query(SSlOnline).filter(SSlOnline.domain == domain, SSlOnline.cdn_type == checked_domain.type).first():
                 ssl = query_ssl
