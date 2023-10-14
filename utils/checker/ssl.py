@@ -13,7 +13,6 @@ from json2html import *
 
 from log import logger
 from utils.checker.type import CheckedCnameModel
-from model.db import db, SSlOnline
 
 
 if runtime_type.get('flask'):
