@@ -12,6 +12,7 @@ from OpenSSL import SSL
 from json2html import *
 
 from log import logger
+from configs import runtime_type
 from utils.checker.type import CheckedCnameModel
 
 
