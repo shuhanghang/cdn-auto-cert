@@ -8,8 +8,8 @@ spec:
       - provider: alidns
         caProvider: ''    # 默认值为'letsencrypt'，也可以不写该字段
         domains:
-          - test1.cn           # 二级域名
-          - www.test2.com      # 全域名
+          - test1.cn           # 匹配二级域名的加速域名
+          - www.test2.com      # 匹配全域名的加速域名
       - provider: tencentcloud
         domains:
           - "test1.net"
