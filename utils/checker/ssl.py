@@ -1,26 +1,23 @@
 import socket
 import sys
 import json
-
-from retry import retry
-import timeout_decorator
-
 from datetime import datetime
 from ssl import PROTOCOL_TLSv1
 from time import sleep
 from csv import DictWriter
-from log import logger
-from flask import g
 
+from retry import retry
+import timeout_decorator
+from OpenSSL import SSL
+from json2html import *
+
+from log import logger
 from utils.checker.type import CheckedCnameModel
 from model.db import db, SSlOnline
 
-try:
-    from OpenSSL import SSL
-    from json2html import *
-except ImportError:
-    print('Please install required modules: pip install -r requirements.txt')
-    sys.exit(1)
+
+if runtime_type.get('flask'):
+    from model.db import db, SSlOnline
 
 class ShowResultNull(Exception):
     """
@@ -375,7 +372,7 @@ def check(checked_domain: CheckedCnameModel):
     try:
         args = {'hosts': [domain]}
         check_res = json.loads(SSLChecker.show_result(SSLChecker.get_args(json_args=args)))
-        if check_res and g:
+        if check_res and runtime_type.get('flask'):
             ssl = SSlOnline()
             if query_ssl := db.session.query(SSlOnline).filter(SSlOnline.domain == domain, SSlOnline.cdn_type == checked_domain.type).first():
                 ssl = query_ssl
