@@ -43,9 +43,9 @@ python3 app.py
 ```shell
 docker build -t cdn-auto-cert:latest -f Dockerfiles/basic/Dockerfile .
 docker run --name cdn-auto-cert -it \
-  -v $PWD/configs/config.py:/home/config/config.py \
-  -v $PWD/configs/providers.yml:/home/config/providers.yml \
-  -v $PWD/configs/secret.py:/home/config/secret.py \
+  -v $PWD/configs/config.py:/home/configs/config.py \
+  -v $PWD/configs/providers.yml:/home/configs/providers.yml \
+  -v $PWD/configs/secret.py:/home/configs/secret.py \
   -d cdn-auto-cert:latest
 ```
 ---
@@ -54,9 +54,9 @@ docker run --name cdn-auto-cert -it \
 docker build -t cdn-auto-cert-ui:latest -f Dockerfiles/ui/Dockerfile .
 docker run --name cdn-auto-cert -it \
   -p 8080:8080 \
-  -v $PWD/configs/config.py:/home/config/config.py \
-  -v $PWD/configs/providers.yml:/home/config/providers.yml \
-  -v $PWD/configs/secret.py:/home/config/secret.py \
+  -v $PWD/configs/config.py:/home/configs/config.py \
+  -v $PWD/configs/providers.yml:/home/configs/providers.yml \
+  -v $PWD/configs/secret.py:/home/configs/secret.py \
   -d cdn-auto-cert-ui:latest
 ```
 
